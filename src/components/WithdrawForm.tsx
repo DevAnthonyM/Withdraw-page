@@ -3,31 +3,14 @@
 import { useState } from 'react';
 import { useWithdrawStore } from '@/stores/useWithdrawStore';
 import { validateWithdrawForm } from '@/lib/validators';
-import { ApiError } from '@/types/withdrawal';
-
-// ---------------------------------------------------------------------------
-// Error message mapping
-// WHY: Components must never show raw HTTP errors to users.
-// Every error case is mapped to a human-readable, actionable message.
-// ---------------------------------------------------------------------------
-function getErrorMessage(error: ApiError): string {
-  if (error.isConflict) {
-    return "This withdrawal has already been submitted. If you don't see it in your history, please wait a moment and refresh.";
-  }
-  if (error.isRetryable) {
-    return 'A temporary error occurred. Your data has been saved — you can retry safely.';
-  }
-  return error.message || 'An unexpected error occurred. Please try again.';
-}
+import WithdrawError from '@/components/WithdrawError';
 
 export default function WithdrawForm() {
   const {
     formData,
     status,
-    error,
     setFormField,
     submitWithdrawal,
-    retrySubmission,
   } = useWithdrawStore();
 
   // Track which fields have been blurred — show errors only after blur (UX best practice)
@@ -49,36 +32,15 @@ export default function WithdrawForm() {
     await submitWithdrawal();
   }
 
-  async function handleRetry() {
-    await retrySubmission();
-  }
-
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
 
       {/* ------------------------------------------------------------------ */}
-      {/* Error Banner — shown when status === 'error'                        */}
-      {/* Form values remain intact so user can retry without re-entering     */}
+      {/* Error Banner — rendered by WithdrawError component                  */}
+      {/* WHY extracted: single source of truth for error message mapping.    */}
+      {/* WithdrawForm stays focused on form logic only.                      */}
       {/* ------------------------------------------------------------------ */}
-      {status === 'error' && error && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
-        >
-          <p className="text-sm font-medium text-red-800">
-            {getErrorMessage(error)}
-          </p>
-          {error.isRetryable && (
-            <button
-              onClick={handleRetry}
-              className="mt-3 text-sm font-semibold text-red-700 underline hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
-            >
-              Retry withdrawal
-            </button>
-          )}
-        </div>
-      )}
+      {status === 'error' && <WithdrawError />}
 
       {/* ------------------------------------------------------------------ */}
       {/* Amount Field                                                        */}
