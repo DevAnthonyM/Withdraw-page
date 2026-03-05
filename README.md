@@ -3,8 +3,8 @@
 ## Quick Start
 
 ```bash
-git clone <repo>
-cd bem-withdraw
+git clone https://github.com/DevAnthonyM/Withdraw-page.git
+cd Withdraw-page
 npm install
 npm run dev          # Development server at http://localhost:3000
 npm test             # Run test suite
@@ -128,7 +128,7 @@ and mock the API service at the module level for full isolation.
 src/
 ├── app/
 │   ├── layout.tsx              # Root layout
-│   ├── page.tsx                # Home page
+│   ├── page.tsx                # Home → redirects to /withdraw
 │   └── withdraw/
 │       └── page.tsx            # Withdraw page (main deliverable)
 ├── components/
